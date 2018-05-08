@@ -26,10 +26,6 @@ public class TransRepoProjVO {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     /**
      * Este atributo é recuperado da tabela TAL.
      * @return 
