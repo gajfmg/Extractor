@@ -10,7 +10,7 @@ public class Commit {
 	private Verification verification;
 	
 	
-	public Author getaAuthor() {
+	public Author getAuthor() {
 		return author;
 	}
 	public void setAuthor(Author author) {

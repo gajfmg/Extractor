@@ -7,7 +7,9 @@ package com.br.gabriel.service;
 
 import com.br.gabriel.dao.AuthorDao;
 import com.br.gabriel.dao.DimensaoTempoDao;
+import com.br.gabriel.dao.GerenteDao;
 import com.br.gabriel.vo.TransRepoProjVO;
+import entity.Owner;
 import entity.Push;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,7 +20,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -32,6 +33,7 @@ public class ExtratorService {
     private List<TransRepoProjVO> list = new ArrayList<>();
     private final AuthorDao authorDao = new AuthorDao();
     private final DimensaoTempoDao dimensaoTempoDao = new DimensaoTempoDao();
+    private final GerenteDao gerenteDao = new GerenteDao();
     
     public StringBuilder recuperarJsonPorUrl(String url) throws IOException {
             HttpClient client;
@@ -52,16 +54,15 @@ public class ExtratorService {
             return sb;
     }
     
-    public void extrairDados(List<Push> lstPush) throws SQLException {
+    public void extrairDados(List<Push> lstPush, Owner owner) throws SQLException {
         for(Push push : lstPush){
-            if(push != null ){
-                
+            if(push != null ){                
                 if (extrairIdAuthorPorNome(push) != null) {
                     TransRepoProjVO vo = new TransRepoProjVO();
                     vo.setIdDesenvolvedor(extrairIdAuthorPorNome(push));
                     vo.setCommit(push.getCommit().getMessage());
                     vo.setIdDmsaoTempo(extrairIdDmsaoTempo(push));
-                    
+                    vo.setIdGerenteProj(extrairIdGerentePorNome(owner));
                     list.add(vo);
                 }
             }
@@ -69,18 +70,22 @@ public class ExtratorService {
     }
 
     private Integer extrairIdAuthorPorNome(Push push) throws SQLException {
-        return authorDao.recuperarIdAuthorPorNome(push.getCommit().getaAuthor().getName());
+        return authorDao.recuperarIdAuthorPorNome(push.getCommit().getAuthor().getName());
+    }
+    
+    private Integer extrairIdGerentePorNome(Owner owner) throws SQLException {
+        return gerenteDao.recuperarIdGerentePorNome(owner.getName());
     }
 
-    private int extrairIdDmsaoTempo(Push push) throws SQLException {
-        Date dataCommit = push.getCommit().getaAuthor().getDate();
+    private Integer extrairIdDmsaoTempo(Push push) throws SQLException {
+        Date dataCommit = push.getCommit().getAuthor().getDate();
         Calendar c = Calendar.getInstance();
         c.setTime(dataCommit);
-        int dia = c.get(Calendar.DAY_OF_MONTH);
-        int mes = c.get(Calendar.MONTH);
-        int ano = c.get(Calendar.YEAR);
+        Integer dia = c.get(Calendar.DAY_OF_MONTH);
+        Integer mes = c.get(Calendar.MONTH);
+        Integer ano = c.get(Calendar.YEAR);
         
-        return dimensaoTempoDao.recuperarIdDataPorDiaMesAno(dia, mes, ano);
+        return dimensaoTempoDao.recuperarIdDataPorDiaMesAno(dia, mes + 1, ano);
     }
     
 }

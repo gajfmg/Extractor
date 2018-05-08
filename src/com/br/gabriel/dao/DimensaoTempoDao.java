@@ -26,7 +26,7 @@ public class DimensaoTempoDao {
         connection = new ConnectionFactory().getConnection();
     }
     
-    public Integer recuperarIdDataPorDiaMesAno (int dia, int mes, int ano) throws SQLException {
+    public Integer recuperarIdDataPorDiaMesAno (Integer dia, Integer mes, Integer ano) throws SQLException {
         PreparedStatement ps = (PreparedStatement) connection.prepareStatement(RECUPERAR_ID_DATA_POR_DIA_MES_ANO);
         ResultSet rs;
         ps.setInt(1, dia);

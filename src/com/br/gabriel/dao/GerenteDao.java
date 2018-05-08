@@ -14,25 +14,25 @@ import java.sql.Statement;
  *
  * @author gabriel
  */
-public class AuthorDao {
+public class GerenteDao {
     Connection connection = null;
-    private final String RECUPERAR_ID_AUTOR_POR_NOME = "SELECT sk_desenv FROM t_desenv WHERE nm_desenv = '";
+    private final String RECUPERAR_ID_GERENTE_POR_NOME = "SELECT sk_grnte_proj FROM t_grnte_proj WHERE nm_grnte_proj = '";
     
     
-    public AuthorDao () {
+    public GerenteDao () {
         connection = new ConnectionFactory().getConnection();
     }
     
-    public Integer recuperarIdAuthorPorNome (String nome) throws SQLException {
+    public Integer recuperarIdGerentePorNome (String nome) throws SQLException {
         Statement ps = connection.createStatement();
         ResultSet rs;
         
-        rs = ps.executeQuery(RECUPERAR_ID_AUTOR_POR_NOME + nome + "'");
+        rs = ps.executeQuery(RECUPERAR_ID_GERENTE_POR_NOME + nome + "'");
         
         Integer id = null;
         
         while (rs.next()) {
-            id = rs.getInt("sk_desenv");
+            id = rs.getInt("sk_grnte_proj");
         }
         ps.close();
         return id;
