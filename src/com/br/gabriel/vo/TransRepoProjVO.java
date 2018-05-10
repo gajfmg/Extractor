@@ -13,7 +13,7 @@ public class TransRepoProjVO {
     
     private int id;
     private int idDesenvolvedor;
-    private int idRepoProh;
+    private int idRepoProj;
     private int idGerenteProj;
     private int idDmsaoTempo;
     private String commit;
@@ -38,12 +38,12 @@ public class TransRepoProjVO {
         this.idDesenvolvedor = idDesenvolvedor;
     }
 
-    public int getIdRepoProh() {
-        return idRepoProh;
+    public int getIdRepoProj() {
+        return idRepoProj;
     }
 
-    public void setIdRepoProh(int idRepoProh) {
-        this.idRepoProh = idRepoProh;
+    public void setIdRepoProj(int idRepoProh) {
+        this.idRepoProj = idRepoProh;
     }
 
     public int getIdGerenteProj() {

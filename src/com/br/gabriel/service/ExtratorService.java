@@ -8,8 +8,10 @@ package com.br.gabriel.service;
 import com.br.gabriel.dao.AuthorDao;
 import com.br.gabriel.dao.DimensaoTempoDao;
 import com.br.gabriel.dao.GerenteDao;
+import com.br.gabriel.dao.ProjetoDao;
 import com.br.gabriel.vo.TransRepoProjVO;
 import entity.Owner;
+import entity.Project;
 import entity.Push;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,6 +36,7 @@ public class ExtratorService {
     private final AuthorDao authorDao = new AuthorDao();
     private final DimensaoTempoDao dimensaoTempoDao = new DimensaoTempoDao();
     private final GerenteDao gerenteDao = new GerenteDao();
+    private final ProjetoDao projetoDao = new ProjetoDao();
     
     public StringBuilder recuperarJsonPorUrl(String url) throws IOException {
             HttpClient client;
@@ -54,15 +57,16 @@ public class ExtratorService {
             return sb;
     }
     
-    public void extrairDados(List<Push> lstPush, Owner owner) throws SQLException {
+    public void extrairDados(List<Push> lstPush, Owner owner,Project project) throws SQLException {
         for(Push push : lstPush){
-            if(push != null ){                
+            if(push != null){                
                 if (extrairIdAuthorPorNome(push) != null) {
                     TransRepoProjVO vo = new TransRepoProjVO();
                     vo.setIdDesenvolvedor(extrairIdAuthorPorNome(push));
                     vo.setCommit(push.getCommit().getMessage());
                     vo.setIdDmsaoTempo(extrairIdDmsaoTempo(push));
                     vo.setIdGerenteProj(extrairIdGerentePorNome(owner));
+                    vo.setIdRepoProj(extrairIdProjetoPorNome(project));
                     list.add(vo);
                 }
             }
@@ -75,6 +79,10 @@ public class ExtratorService {
     
     private Integer extrairIdGerentePorNome(Owner owner) throws SQLException {
         return gerenteDao.recuperarIdGerentePorNome(owner.getName());
+    }
+    
+     private Integer extrairIdProjetoPorNome(Project project) throws SQLException {
+        return projetoDao.recuperarIdProjetoPorNome(project.getName());
     }
 
     private Integer extrairIdDmsaoTempo(Push push) throws SQLException {

@@ -27,7 +27,7 @@ public class TransRepoProjDao {
     public void insert (TransRepoProjVO vo) throws SQLException {
         PreparedStatement ps = connection.prepareStatement(INSERIR);
         ps.setInt(2,vo.getIdDesenvolvedor());
-        ps.setInt(3,vo.getIdRepoProh());
+        ps.setInt(3,vo.getIdRepoProj());
         ps.setInt(4,vo.getIdGerenteProj());
         ps.setInt(5,vo.getIdDmsaoTempo());
         ps.setString(6, vo.getCommit());    
