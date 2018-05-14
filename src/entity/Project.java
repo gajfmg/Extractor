@@ -10,17 +10,8 @@ package entity;
  * @author Gabriel
  */
 public class Project {
-     private Project project;
-     private String name;
-
-    public Project getProject() {
-        return project;
-    }
-
-    public void setProject(Project project) {
-        this.project = project;
-    }
-
+    private String name;
+     
     public String getName() {
         return name;
     }

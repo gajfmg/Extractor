@@ -7,15 +7,19 @@ package com.br.gabriel.service;
 
 import com.br.gabriel.dao.AuthorDao;
 import com.br.gabriel.dao.DimensaoTempoDao;
+import com.br.gabriel.dao.ExtractorDao;
 import com.br.gabriel.dao.GerenteDao;
 import com.br.gabriel.dao.ProjetoDao;
 import com.br.gabriel.vo.TransRepoProjVO;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import entity.Owner;
 import entity.Project;
 import entity.Push;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,13 +36,31 @@ import org.apache.http.impl.client.HttpClientBuilder;
  */
 public class ExtratorService {
 
-    private List<TransRepoProjVO> list = new ArrayList<>();
     private final AuthorDao authorDao = new AuthorDao();
     private final DimensaoTempoDao dimensaoTempoDao = new DimensaoTempoDao();
     private final GerenteDao gerenteDao = new GerenteDao();
     private final ProjetoDao projetoDao = new ProjetoDao();
+    private final ExtractorDao extractorDao = new ExtractorDao();
+    private final String URL_PADRAO = "https://api.github.com/repos/gajfmg/web-app";
+    private final String URL_COMMITS = "/commits";
+    private List<TransRepoProjVO> list = new ArrayList<>();
+    private List<Push> lstPush = null;
+    private Owner owner = null;
+    private Project project = null;
     
-    public StringBuilder recuperarJsonPorUrl(String url) throws IOException {
+    
+    private void inicializarObjetos() throws IOException {
+        Type collectionType = new TypeToken<List<Push>>(){}.getType();
+            Type objectType = new TypeToken<Owner>(){}.getType();
+            Type type  = new TypeToken<Project>(){}.getType();          
+            Gson gson = new Gson();           
+            lstPush = (List<Push>) gson.fromJson(recuperarJsonPorUrl(URL_PADRAO + URL_COMMITS).toString(), collectionType);            
+            owner = gson.fromJson(recuperarJsonPorUrl(URL_PADRAO).toString(), objectType);                  
+            owner = gson.fromJson(recuperarJsonPorUrl(owner.getOwner().getUrl()).toString(), objectType);            
+            project = gson.fromJson(recuperarJsonPorUrl(URL_PADRAO).toString(), type);
+    }
+    
+    private StringBuilder recuperarJsonPorUrl(String url) throws IOException {
             HttpClient client;
             client = HttpClientBuilder.create().build();
 
@@ -55,22 +77,6 @@ public class ExtratorService {
             rd.close();
             
             return sb;
-    }
-    
-    public void extrairDados(List<Push> lstPush, Owner owner,Project project) throws SQLException {
-        for(Push push : lstPush){
-            if(push != null){                
-                if (extrairIdAuthorPorNome(push) != null) {
-                    TransRepoProjVO vo = new TransRepoProjVO();
-                    vo.setIdDesenvolvedor(extrairIdAuthorPorNome(push));
-                    vo.setCommit(push.getCommit().getMessage());
-                    vo.setIdDmsaoTempo(extrairIdDmsaoTempo(push));
-                    vo.setIdGerenteProj(extrairIdGerentePorNome(owner));
-                    vo.setIdRepoProj(extrairIdProjetoPorNome(project));
-                    list.add(vo);
-                }
-            }
-        }
     }
 
     private Integer extrairIdAuthorPorNome(Push push) throws SQLException {
@@ -96,4 +102,25 @@ public class ExtratorService {
         return dimensaoTempoDao.recuperarIdDataPorDiaMesAno(dia, mes + 1, ano);
     }
     
+    private void salvarDados() {
+        list.forEach(vo -> extractorDao.salvarDados(vo));
+    }
+    
+    public void extrairDados() throws SQLException, IOException {
+        inicializarObjetos();
+        for(Push push : lstPush){
+            if(push != null){                
+                if (extrairIdAuthorPorNome(push) != null) {
+                    TransRepoProjVO vo = new TransRepoProjVO();
+                    vo.setIdDesenvolvedor(extrairIdAuthorPorNome(push));
+                    vo.setCommit(push.getCommit().getMessage());
+                    vo.setIdDmsaoTempo(extrairIdDmsaoTempo(push));
+                    vo.setIdGerenteProj(extrairIdGerentePorNome(owner));
+                    vo.setIdRepoProj(extrairIdProjetoPorNome(project));
+                    list.add(vo);
+                }
+            }
+        }
+        salvarDados();
+    }
 }
