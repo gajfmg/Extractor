@@ -41,7 +41,9 @@ public class ExtratorService {
     private final GerenteDao gerenteDao = new GerenteDao();
     private final ProjetoDao projetoDao = new ProjetoDao();
     private final ExtractorDao extractorDao = new ExtractorDao();
-    private final String URL_PADRAO = "https://api.github.com/repos/gajfmg/web-app";
+    private final String login_github ="gajfmg";
+    private final String nome_projeto ="WEB-APP";
+    private final String URL_PADRAO = "https://api.github.com/repos/"+login_github+"/"+nome_projeto;
     private final String URL_COMMITS = "/commits";
     private List<TransRepoProjVO> list = new ArrayList<>();
     private List<Push> lstPush = null;
